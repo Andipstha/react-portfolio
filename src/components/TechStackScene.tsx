@@ -1,0 +1,203 @@
+import * as THREE from "three";
+import { useRef, useMemo, useState, useEffect } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Environment } from "@react-three/drei";
+import { EffectComposer, N8AO } from "@react-three/postprocessing";
+// Dynamically import @react-three/rapier inside the component to code-split physics
+
+const textureLoader = new THREE.TextureLoader();
+const baseUrl = import.meta.env.BASE_URL;
+const imageUrls = [
+  "images/react2.webp",
+  "images/next2.webp",
+  "images/node2.webp",
+  "images/express.webp",
+  "images/mongo.webp",
+  "images/mysql.webp",
+  "images/typescript.webp",
+  "images/javascript.webp",
+];
+const textures = imageUrls.map((url) => textureLoader.load(`${baseUrl}${url}`));
+
+const sphereGeometry = new THREE.SphereGeometry(1, 28, 28);
+
+const spheres = [...Array(30)].map(() => ({
+  scale: [0.7, 1, 0.8, 1, 1][Math.floor(Math.random() * 5)],
+  r: THREE.MathUtils.randFloatSpread,
+}));
+
+type SphereProps = {
+  vec?: THREE.Vector3;
+  scale: number;
+  r?: typeof THREE.MathUtils.randFloatSpread;
+  material: THREE.MeshPhysicalMaterial;
+  isActive: boolean;
+  apiRef?: { current: any } | null;
+};
+
+function SphereGeo({
+  vec = new THREE.Vector3(),
+  scale,
+  material,
+  isActive,
+  apiRef,
+}: SphereProps) {
+  const localApi = useRef<any | null>(null);
+
+  useFrame((_state, delta) => {
+    if (!isActive) return;
+    delta = Math.min(0.1, delta);
+    const targetApi = apiRef?.current ?? localApi.current;
+    const translation = (typeof targetApi?.translation === "function"
+      ? targetApi.translation()
+      : new THREE.Vector3()) as THREE.Vector3;
+    const impulse = vec.copy(translation).normalize().multiply(
+      new THREE.Vector3(
+        -50 * delta * scale,
+        -150 * delta * scale,
+        -50 * delta * scale
+      )
+    );
+
+    targetApi?.applyImpulse?.(impulse, true);
+  });
+
+  // Return only the visual mesh here; physics wrappers are applied by the parent
+  return (
+    <mesh
+      castShadow
+      receiveShadow
+      scale={scale}
+      geometry={sphereGeometry}
+      material={material}
+      rotation={[0.3, 1, 1]}
+    />
+  );
+}
+
+// Pointer functionality handled via kinematic body when rapier loads
+
+const TechStackScene = () => {
+  const [isActive, setIsActive] = useState(false);
+  const [RapierModule, setRapierModule] = useState<any | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    import("@react-three/rapier").then((m) => {
+      if (mounted) setRapierModule(m);
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const threshold = document.getElementById("work")?.getBoundingClientRect().top || 0;
+      setIsActive(scrollY > threshold);
+    };
+    document.querySelectorAll(".header a").forEach((elem) => {
+      const element = elem as HTMLAnchorElement;
+      element.addEventListener("click", () => {
+        const interval = setInterval(() => {
+          handleScroll();
+        }, 10);
+        setTimeout(() => {
+          clearInterval(interval);
+        }, 1000);
+      });
+    });
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const materials = useMemo(() => {
+    return textures.map(
+      (texture) =>
+        new THREE.MeshPhysicalMaterial({
+          map: texture,
+          emissive: "#ffffff",
+          emissiveMap: texture,
+          emissiveIntensity: 0.3,
+          metalness: 0.5,
+          roughness: 1,
+          clearcoat: 0.1,
+        })
+    );
+  }, []);
+  const sphereRefs = useRef<any[]>([]);
+
+  return (
+    <div className="techstack">
+      <h2> My Techstack</h2>
+
+      <Canvas
+        shadows
+        gl={{ alpha: true, stencil: false, depth: false, antialias: false }}
+        camera={{ position: [0, 0, 20], fov: 32.5, near: 1, far: 100 }}
+        onCreated={(state) => (state.gl.toneMappingExposure = 1.5)}
+        className="tech-canvas"
+      >
+        <ambientLight intensity={1} />
+        <spotLight
+          position={[20, 20, 25]}
+          penumbra={1}
+          angle={0.2}
+          color="white"
+          castShadow
+          shadow-mapSize={[512, 512]}
+        />
+        <directionalLight position={[0, 5, -4]} intensity={2} />
+        {RapierModule ? (
+          <RapierModule.Physics gravity={[0, 0, 0]}>
+            {/* attach a kinematic pointer body for interactivity */}
+            <RapierModule.RigidBody type="kinematicPosition" colliders={false}>
+              {/* empty kinematic body placeholder */}
+            </RapierModule.RigidBody>
+            {spheres.map((props, i) => {
+              if (!sphereRefs.current[i]) sphereRefs.current[i] = { current: null };
+              const pos = [props.r!(20), props.r!(20) - 25, props.r!(20) - 10];
+              return (
+                <RapierModule.RigidBody
+                  key={i}
+                  colliders={false}
+                  linearDamping={0.75}
+                  angularDamping={0.15}
+                  friction={0.2}
+                  position={pos}
+                  ref={sphereRefs.current[i]}
+                >
+                  <RapierModule.BallCollider args={[props.scale]} />
+                  <RapierModule.CylinderCollider
+                    rotation={[Math.PI / 2, 0, 0]}
+                    position={[0, 0, 1.2 * props.scale]}
+                    args={[0.15 * props.scale, 0.275 * props.scale]}
+                  />
+                  <SphereGeo
+                    {...props}
+                    material={materials[Math.floor(Math.random() * materials.length)]}
+                    isActive={isActive}
+                    apiRef={sphereRefs.current[i]}
+                  />
+                </RapierModule.RigidBody>
+              );
+            })}
+          </RapierModule.Physics>
+        ) : null}
+        <Environment
+          files={`${baseUrl}models/char_enviorment.hdr`}
+          environmentIntensity={0.5}
+          environmentRotation={[0, 4, 2]}
+        />
+        <EffectComposer enableNormalPass={false}>
+          <N8AO color="#0f002c" aoRadius={2} intensity={1.15} />
+        </EffectComposer>
+      </Canvas>
+    </div>
+  );
+};
+
+export default TechStackScene;
