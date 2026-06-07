@@ -1,15 +1,79 @@
 import * as THREE from "three";
 import gsap from "gsap";
 
+let tl1: gsap.core.Timeline | null = null;
+let tl2: gsap.core.Timeline | null = null;
+let tl3: gsap.core.Timeline | null = null;
+let tM2: gsap.core.Timeline | null = null;
+let careerTimeline: gsap.core.Timeline | null = null;
+let intensityInterval: number | null = null;
+let emissiveTimeline: gsap.core.Timeline | null = null;
+
+export function cleanupScrollTimelines() {
+  if (intensityInterval) {
+    clearInterval(intensityInterval);
+    intensityInterval = null;
+  }
+  if (emissiveTimeline) {
+    emissiveTimeline.kill();
+    emissiveTimeline = null;
+  }
+  if (tl1) {
+    tl1.scrollTrigger?.kill();
+    tl1.kill();
+    tl1 = null;
+  }
+  if (tl2) {
+    tl2.scrollTrigger?.kill();
+    tl2.kill();
+    tl2 = null;
+  }
+  if (tl3) {
+    tl3.scrollTrigger?.kill();
+    tl3.kill();
+    tl3 = null;
+  }
+  if (tM2) {
+    tM2.scrollTrigger?.kill();
+    tM2.kill();
+    tM2 = null;
+  }
+  if (careerTimeline) {
+    careerTimeline.scrollTrigger?.kill();
+    careerTimeline.kill();
+    careerTimeline = null;
+  }
+}
+
 export function setCharTimeline(
   character: THREE.Object3D<THREE.Object3DEventMap> | null,
   camera: THREE.PerspectiveCamera
 ) {
+  if (intensityInterval) {
+    clearInterval(intensityInterval);
+  }
+  if (emissiveTimeline) {
+    emissiveTimeline.kill();
+  }
+  if (tl1) {
+    tl1.scrollTrigger?.kill();
+    tl1.kill();
+  }
+  if (tl2) {
+    tl2.scrollTrigger?.kill();
+    tl2.kill();
+  }
+  if (tl3) {
+    tl3.scrollTrigger?.kill();
+    tl3.kill();
+  }
+
   let intensity: number = 0;
-  setInterval(() => {
+  intensityInterval = setInterval(() => {
     intensity = Math.random();
-  }, 200);
-  const tl1 = gsap.timeline({
+  }, 200) as any;
+
+  tl1 = gsap.timeline({
     scrollTrigger: {
       trigger: ".landing-section",
       start: "top top",
@@ -18,7 +82,7 @@ export function setCharTimeline(
       invalidateOnRefresh: true,
     },
   });
-  const tl2 = gsap.timeline({
+  tl2 = gsap.timeline({
     scrollTrigger: {
       trigger: ".about-section",
       start: "center 55%",
@@ -27,7 +91,7 @@ export function setCharTimeline(
       invalidateOnRefresh: true,
     },
   });
-  const tl3 = gsap.timeline({
+  tl3 = gsap.timeline({
     scrollTrigger: {
       trigger: ".whatIDO",
       start: "top top",
@@ -52,7 +116,7 @@ export function setCharTimeline(
       object.material.transparent = true;
       object.material.opacity = 0;
       object.material.emissive.set("#C8BFFF");
-      gsap.timeline({ repeat: -1, repeatRefresh: true }).to(object.material, {
+      emissiveTimeline = gsap.timeline({ repeat: -1, repeatRefresh: true }).to(object.material, {
         emissiveIntensity: () => intensity * 8,
         duration: () => Math.random() * 0.6,
         delay: () => Math.random() * 0.1,
@@ -120,7 +184,11 @@ export function setCharTimeline(
     }
   } else {
     if (character) {
-      const tM2 = gsap.timeline({
+      if (tM2) {
+        tM2.scrollTrigger?.kill();
+        tM2.kill();
+      }
+      tM2 = gsap.timeline({
         scrollTrigger: {
           trigger: ".what-box-in",
           start: "top 70%",
@@ -133,7 +201,11 @@ export function setCharTimeline(
 }
 
 export function setAllTimeline() {
-  const careerTimeline = gsap.timeline({
+  if (careerTimeline) {
+    careerTimeline.scrollTrigger?.kill();
+    careerTimeline.kill();
+  }
+  careerTimeline = gsap.timeline({
     scrollTrigger: {
       trigger: ".career-section",
       start: "top 30%",
