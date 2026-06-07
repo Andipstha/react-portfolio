@@ -20,17 +20,14 @@ const Career = () => {
               </div>
               <h3>2020</h3>
             </div>
-            <p>
+            <ul>
               <li> Develop creative advertising content for various media, including catalogs, menus, business
 cards, flyers, posters.</li>
 <li>Conceptualize logo design, gif animations, videos, websites and social media channels to
 promote product brands.</li>
 <li>Used composition and color theory knowledge to design websites according to client need
 and preferences. </li>
-            
-
-
-            </p>
+            </ul>
           </div>
           <div className="career-info-box">
             <div className="career-info-in">

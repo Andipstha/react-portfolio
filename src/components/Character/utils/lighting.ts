@@ -29,6 +29,7 @@ const setLighting = (scene: THREE.Scene) => {
     });
 
   function setPointLight(screenLight: any) {
+    if (!screenLight) return; // guard: screenlight mesh may not exist in GLTF
     if (screenLight.material.opacity > 0.9) {
       pointLight.intensity = screenLight.material.emissiveIntensity * 20;
     } else {

@@ -162,16 +162,23 @@ const WhatIDo = () => {
 export default WhatIDo;
 
 function handleClick(container: HTMLDivElement) {
-  container.classList.toggle("what-content-active");
-  container.classList.remove("what-sibling");
+  const isActive = container.classList.contains("what-content-active");
   if (container.parentElement) {
     const siblings = Array.from(container.parentElement.children);
-
+    // First clear all states
     siblings.forEach((sibling) => {
-      if (sibling !== container) {
-        sibling.classList.remove("what-content-active");
-        sibling.classList.toggle("what-sibling");
-      }
+      sibling.classList.remove("what-content-active", "what-sibling");
     });
+  }
+  if (!isActive) {
+    // Activate clicked, mark siblings
+    container.classList.add("what-content-active");
+    if (container.parentElement) {
+      Array.from(container.parentElement.children).forEach((sibling) => {
+        if (sibling !== container) {
+          sibling.classList.add("what-sibling");
+        }
+      });
+    }
   }
 }

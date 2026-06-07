@@ -21,12 +21,16 @@ const SocialIcons = () => {
       const link = elem.querySelector("a") as HTMLElement;
       if (!link) return;
 
-      const rect = elem.getBoundingClientRect();
-      let mouseX = rect.width / 2;
-      let mouseY = rect.height / 2;
+      let mouseX = 0;
+      let mouseY = 0;
       let currentX = 0;
       let currentY = 0;
       let animationFrameId: number;
+
+      // Initialize to element center
+      const initRect = elem.getBoundingClientRect();
+      mouseX = initRect.width / 2;
+      mouseY = initRect.height / 2;
 
       const updatePosition = () => {
         currentX += (mouseX - currentX) * 0.1;
@@ -39,6 +43,8 @@ const SocialIcons = () => {
       };
 
       const onMouseMove = (e: MouseEvent) => {
+        // Re-query rect on each move so it's never stale after scroll/resize
+        const rect = elem.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 

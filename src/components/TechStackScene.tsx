@@ -21,9 +21,12 @@ const textures = imageUrls.map((url) => textureLoader.load(`${baseUrl}${url}`));
 
 const sphereGeometry = new THREE.SphereGeometry(1, 28, 28);
 
+const MATERIAL_COUNT = imageUrls.length;
 const spheres = [...Array(30)].map(() => ({
   scale: [0.7, 1, 0.8, 1, 1][Math.floor(Math.random() * 5)],
   r: THREE.MathUtils.randFloatSpread,
+  // Pre-assign a stable material index so it doesn't change on every render
+  materialIndex: Math.floor(Math.random() * MATERIAL_COUNT),
 }));
 
 type SphereProps = {
@@ -93,24 +96,37 @@ const TechStackScene = () => {
 
   useEffect(() => {
     const handleScroll = () => {
+      // Use offsetTop for page-relative position instead of getBoundingClientRect().top
+      // which is viewport-relative and cannot be compared to scrollY directly
+      const workEl = document.getElementById("work");
+      const threshold = workEl ? workEl.offsetTop : 0;
       const scrollY = window.scrollY || document.documentElement.scrollTop;
-      const threshold = document.getElementById("work")?.getBoundingClientRect().top || 0;
       setIsActive(scrollY > threshold);
     };
-    document.querySelectorAll(".header a").forEach((elem) => {
-      const element = elem as HTMLAnchorElement;
-      element.addEventListener("click", () => {
+
+    // Track click handlers so they can be cleaned up
+    const navLinks = document.querySelectorAll(".header a");
+    const navClickHandlers = new Map<Element, () => void>();
+    navLinks.forEach((elem) => {
+      const clickHandler = () => {
         const interval = setInterval(() => {
           handleScroll();
         }, 10);
         setTimeout(() => {
           clearInterval(interval);
         }, 1000);
-      });
+      };
+      navClickHandlers.set(elem, clickHandler);
+      elem.addEventListener("click", clickHandler);
     });
+
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      // Clean up navbar click listeners
+      navClickHandlers.forEach((handler, elem) => {
+        elem.removeEventListener("click", handler);
+      });
     };
   }, []);
 
@@ -178,7 +194,7 @@ const TechStackScene = () => {
                   />
                   <SphereGeo
                     {...props}
-                    material={materials[Math.floor(Math.random() * materials.length)]}
+                    material={materials[props.materialIndex]}
                     isActive={isActive}
                     apiRef={sphereRefs.current[i]}
                   />

@@ -11,8 +11,8 @@ import {
   handleTouchMove,
 } from "./utils/mouseUtils";
 import setAnimations from "./utils/animationUtils";
-import { setProgress } from "../Loading";
-import { cleanupScrollTimelines } from "../utils/GsapScroll";
+import { setProgress } from "../utils/progressUtils";
+import { cleanupScrollTimelines, setCharTimeline, setAllTimeline } from "../utils/GsapScroll";
 
 const Scene = () => {
   const canvasDiv = useRef<HTMLDivElement | null>(null);
@@ -51,22 +51,47 @@ const Scene = () => {
 
       const light = setLighting(scene);
       let progress = setProgress((value) => setLoading(value));
-      const { loadCharacter } = setCharacter(renderer, scene, camera);
+      const { loadCharacter } = setCharacter();
 
       let isCancelled = false;
       let onResize: (() => void) | null = null;
       let cleanupHover: (() => void) | null = null;
       let introTimeout: any = null;
 
-      loadCharacter().then((gltf) => {
+      loadCharacter().then(async (gltf) => {
         if (isCancelled) return;
         if (gltf) {
+          const characterObj = gltf.scene;
+
+          // 1. Traverse and set shadows/frustum culling
+          characterObj.traverse((child: any) => {
+            if (child.isMesh) {
+              const mesh = child as THREE.Mesh;
+              child.castShadow = true;
+              child.receiveShadow = true;
+              mesh.frustumCulled = true;
+            }
+          });
+
+          // 2. Adjust foot positions
+          const footR = characterObj.getObjectByName("footR");
+          const footL = characterObj.getObjectByName("footL");
+          if (footR) footR.position.y = 3.36;
+          if (footL) footL.position.y = 3.36;
+
+          // 3. Compile shaders asynchronously
+          await renderer.compileAsync(characterObj, camera, scene);
+          if (isCancelled) return;
+
+          // 4. Setup scroll timelines
+          setCharTimeline(characterObj, camera);
+          setAllTimeline();
+
           const animations = setAnimations(gltf);
           if (hoverDivRef.current) {
             cleanupHover = animations.hover(gltf, hoverDivRef.current) || null;
           }
           mixer = animations.mixer;
-          const characterObj = gltf.scene;
           scene.add(characterObj);
           headBone = characterObj.getObjectByName("spine006") || null;
           screenLight = characterObj.getObjectByName("screenlight") || null;
@@ -82,7 +107,14 @@ const Scene = () => {
             handleResize(renderer, camera, canvasDiv, characterObj);
           };
           window.addEventListener("resize", onResize);
+        } else {
+          // gltf was null — force loading to complete so the screen doesn't hang
+          if (!isCancelled) progress.clear();
         }
+      }).catch((err) => {
+        console.error("Failed to load character model:", err);
+        // Force loading bar to 100% so the app isn't stuck on the loading screen
+        if (!isCancelled) progress.clear();
       });
 
       let mouse = { x: 0, y: 0 },

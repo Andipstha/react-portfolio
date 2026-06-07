@@ -1,6 +1,13 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./styles/Loading.css";
 import { useLoading } from "../context/LoadingProvider";
+import MarqueeLib from "react-fast-marquee";
+// react-fast-marquee is CJS-only; Vite may wrap it as a namespace object.
+// Use ComponentType so TypeScript accepts children and other props.
+const Marquee = ((MarqueeLib as any).default ?? MarqueeLib) as React.ComponentType<{
+  children?: React.ReactNode;
+  [key: string]: any;
+}>;
 
 const Loading = ({ percent }: { percent: number }) => {
   const { setIsLoading } = useLoading();
@@ -8,17 +15,17 @@ const Loading = ({ percent }: { percent: number }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [clicked, setClicked] = useState(false);
 
+  // Move all setState calls into useEffect to avoid setState-during-render crash
   useEffect(() => {
-    let t1: any;
-    let t2: any;
-    if (percent >= 100) {
-      t1 = setTimeout(() => {
-        setLoaded(true);
-        t2 = setTimeout(() => {
-          setIsLoaded(true);
-        }, 1000);
-      }, 600);
-    }
+    if (percent < 100) return;
+    let t1: ReturnType<typeof setTimeout>;
+    let t2: ReturnType<typeof setTimeout>;
+    t1 = setTimeout(() => {
+      setLoaded(true);
+      t2 = setTimeout(() => {
+        setIsLoaded(true);
+      }, 1000);
+    }, 600);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -26,17 +33,22 @@ const Loading = ({ percent }: { percent: number }) => {
   }, [percent]);
 
   useEffect(() => {
+    if (!isLoaded) return;
+    let cancelled = false;
+    let t: ReturnType<typeof setTimeout>;
     import("./utils/initialFX").then((module) => {
-      if (isLoaded) {
-        setClicked(true);
-        setTimeout(() => {
-          if (module.initialFX) {
-            module.initialFX();
-          }
-          setIsLoading(false);
-        }, 900);
-      }
+      if (cancelled) return;
+      setClicked(true);
+      t = setTimeout(() => {
+        if (cancelled) return;
+        if (module.initialFX) module.initialFX();
+        setIsLoading(false);
+      }, 900);
     });
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
   }, [isLoaded]);
 
   function handleMouseMove(e: React.MouseEvent<HTMLElement>) {
@@ -67,12 +79,10 @@ const Loading = ({ percent }: { percent: number }) => {
       </div>
       <div className="loading-screen">
         <div className="loading-marquee">
-          <div className="loading-marquee-track">
+          <Marquee>
             <span> A Creative Developer</span> <span>A Creative Designer</span>
             <span> A Creative Developer</span> <span>A Creative Designer</span>
-            <span> A Creative Developer</span> <span>A Creative Designer</span>
-            <span> A Creative Developer</span> <span>A Creative Designer</span>
-          </div>
+          </Marquee>
         </div>
         <div
           className={`loading-wrap ${clicked && "loading-clicked"}`}
@@ -99,45 +109,3 @@ const Loading = ({ percent }: { percent: number }) => {
 };
 
 export default Loading;
-
-export const setProgress = (setLoading: (value: number) => void) => {
-  let percent: number = 0;
-
-  let interval = setInterval(() => {
-    if (percent <= 50) {
-      let rand = Math.round(Math.random() * 5);
-      percent = percent + rand;
-      setLoading(percent);
-    } else {
-      clearInterval(interval);
-      interval = setInterval(() => {
-        percent = percent + Math.round(Math.random());
-        setLoading(percent);
-        if (percent > 91) {
-          clearInterval(interval);
-        }
-      }, 2000);
-    }
-  }, 100);
-
-  function clear() {
-    clearInterval(interval);
-    setLoading(100);
-  }
-
-  function loaded() {
-    return new Promise<number>((resolve) => {
-      clearInterval(interval);
-      interval = setInterval(() => {
-        if (percent < 100) {
-          percent++;
-          setLoading(percent);
-        } else {
-          resolve(percent);
-          clearInterval(interval);
-        }
-      }, 2);
-    });
-  }
-  return { loaded, percent, clear };
-};
