@@ -12,7 +12,7 @@ export interface SimpleSplitText {
 
 interface ParaElement extends HTMLElement {
   anim?: gsap.core.Animation;
-  split?: SimpleSplitText;
+  split?: SplitText;
 }
 
 gsap.registerPlugin(ScrollTrigger);
@@ -373,3 +373,6 @@ export default function setSplitText() {
     );
   });
 }
+
+// Automatically refresh ScrollTrigger layout when splitText triggers
+ScrollTrigger.addEventListener("refresh", () => setSplitText());
