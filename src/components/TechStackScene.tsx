@@ -16,6 +16,9 @@ const imageUrls = [
   "images/mysql.webp",
   "images/typescript.webp",
   "images/javascript.webp",
+  "images/photoshop.webp",
+  "images/illustrator.webp",
+  "images/blender.webp",
 ];
 const textures = imageUrls.map((url) => textureLoader.load(`${baseUrl}${url}`));
 
@@ -78,10 +81,45 @@ function SphereGeo({
   );
 }
 
-// Pointer functionality handled via kinematic body when rapier loads
+// Kinematic pointer body tracking the mouse cursor for interactive playability
+type PointerProps = {
+  vec?: THREE.Vector3;
+  isActive: boolean;
+  RapierModule: any;
+};
+
+function Pointer({ vec = new THREE.Vector3(), isActive, RapierModule }: PointerProps) {
+  const ref = useRef<any>(null);
+
+  useFrame(({ pointer, viewport }) => {
+    if (!isActive) return;
+    const targetVec = vec.lerp(
+      new THREE.Vector3(
+        (pointer.x * viewport.width) / 2,
+        (pointer.y * viewport.height) / 2,
+        0
+      ),
+      0.2
+    );
+    ref.current?.setNextKinematicTranslation(targetVec);
+  });
+
+  return (
+    <RapierModule.RigidBody
+      position={[100, 100, 100]}
+      type="kinematicPosition"
+      colliders={false}
+      ref={ref}
+    >
+      <RapierModule.BallCollider args={[2]} />
+    </RapierModule.RigidBody>
+  );
+}
 
 const TechStackScene = () => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [isActive, setIsActive] = useState(false);
+  const [isInViewport, setIsInViewport] = useState(false);
   const [RapierModule, setRapierModule] = useState<any | null>(null);
 
   useEffect(() => {
@@ -94,17 +132,32 @@ const TechStackScene = () => {
     };
   }, []);
 
+  // Performance optimization: IntersectionObserver disables WebGL rendering loops when TechStack is off-screen
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInViewport(entry.isIntersecting);
+      },
+      { threshold: 0.01 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   useEffect(() => {
     const handleScroll = () => {
-      // Use offsetTop for page-relative position instead of getBoundingClientRect().top
-      // which is viewport-relative and cannot be compared to scrollY directly
       const workEl = document.getElementById("work");
       const threshold = workEl ? workEl.offsetTop : 0;
       const scrollY = window.scrollY || document.documentElement.scrollTop;
       setIsActive(scrollY > threshold);
     };
 
-    // Track click handlers so they can be cleaned up
     const navLinks = document.querySelectorAll(".header a");
     const navClickHandlers = new Map<Element, () => void>();
     navLinks.forEach((elem) => {
@@ -123,7 +176,6 @@ const TechStackScene = () => {
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      // Clean up navbar click listeners
       navClickHandlers.forEach((handler, elem) => {
         elem.removeEventListener("click", handler);
       });
@@ -147,12 +199,14 @@ const TechStackScene = () => {
   const sphereRefs = useRef<any[]>([]);
 
   return (
-    <div className="techstack">
+    <div className="techstack" ref={containerRef}>
       <h2> My Techstack</h2>
 
       <Canvas
         shadows="percentage"
         gl={{ alpha: true, stencil: false, depth: false, antialias: false }}
+        dpr={[1, 2]}
+        frameloop={isInViewport ? "always" : "never"}
         camera={{ position: [0, 0, 20], fov: 32.5, near: 1, far: 100 }}
         onCreated={(state) => (state.gl.toneMappingExposure = 1.5)}
         className="tech-canvas"
@@ -169,10 +223,7 @@ const TechStackScene = () => {
         <directionalLight position={[0, 5, -4]} intensity={2} />
         {RapierModule ? (
           <RapierModule.Physics gravity={[0, 0, 0]}>
-            {/* attach a kinematic pointer body for interactivity */}
-            <RapierModule.RigidBody type="kinematicPosition" colliders={false}>
-              {/* empty kinematic body placeholder */}
-            </RapierModule.RigidBody>
+            <Pointer isActive={isActive} RapierModule={RapierModule} />
             {spheres.map((props, i) => {
               if (!sphereRefs.current[i]) sphereRefs.current[i] = { current: null };
               const pos = [props.r!(20), props.r!(20) - 25, props.r!(20) - 10];

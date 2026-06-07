@@ -15,9 +15,10 @@ export default function handleResize(
   renderer.setSize(width, height);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
+  // Keep the work scroll trigger alive; testimonials no longer uses a GSAP pin.
   const workTrigger = ScrollTrigger.getById("work");
   ScrollTrigger.getAll().forEach((trigger) => {
-    if (trigger != workTrigger) {
+    if (trigger !== workTrigger) {
       trigger.kill();
     }
   });

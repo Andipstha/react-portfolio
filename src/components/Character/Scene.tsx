@@ -33,7 +33,7 @@ const Scene = () => {
         antialias: true,
       });
       renderer.setSize(container.width, container.height);
-      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1;
       containerEl.appendChild(renderer.domElement);
@@ -114,6 +114,7 @@ const Scene = () => {
             if (canvasDiv.current) {
               canvasDiv.current.style.opacity = "0";
             }
+            // Keep the work trigger alive during resize; testimonials no longer uses a pin.
             const workTrigger = ScrollTrigger.getById("work");
             ScrollTrigger.getAll().forEach((trigger) => {
               if (trigger !== workTrigger) {
@@ -187,23 +188,30 @@ const Scene = () => {
       let animationFrameId: number;
       const animate = (timestamp: number) => {
         animationFrameId = requestAnimationFrame(animate);
-        timer.update(timestamp);
-        if (headBone) {
-          handleHeadRotation(
-            headBone,
-            mouse.x,
-            mouse.y,
-            interpolation.x,
-            interpolation.y,
-            THREE.MathUtils.lerp
-          );
-          light.setPointLight(screenLight);
+        
+        // Performance check: skip WebGL updates and renders if canvas is off-screen
+        const rect = containerEl.getBoundingClientRect();
+        const isVisible = rect.bottom > 0 && rect.top < window.innerHeight;
+        
+        if (isVisible) {
+          timer.update(timestamp);
+          if (headBone) {
+            handleHeadRotation(
+              headBone,
+              mouse.x,
+              mouse.y,
+              interpolation.x,
+              interpolation.y,
+              THREE.MathUtils.lerp
+            );
+            light.setPointLight(screenLight);
+          }
+          const delta = timer.getDelta();
+          if (mixer) {
+            mixer.update(delta);
+          }
+          renderer.render(scene, camera);
         }
-        const delta = timer.getDelta();
-        if (mixer) {
-          mixer.update(delta);
-        }
-        renderer.render(scene, camera);
       };
       animate(performance.now());
 
