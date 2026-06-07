@@ -47,7 +47,9 @@
 .testimonials-track-wrapper {
   position: relative;
   width: 100%;
-  overflow: hidden;
+  /* overflow: clip does NOT create a scroll container (unlike overflow: hidden),
+     so wheel events propagate normally to the page instead of getting consumed here. */
+  overflow: clip;
 }
 
 /* Soft gradient edges so cards fade in/out nicely */
