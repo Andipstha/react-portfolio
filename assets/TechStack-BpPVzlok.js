@@ -1,0 +1,2 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/TechStackScene-CRzuurHe.js","assets/index-DmpbOFQw.js","assets/index-BNS_3gUB.css","assets/react-three-fiber.esm-DJeYykCz.js"])))=>i.map(i=>d[i]);
+import{i as e,n as t,s as n,t as r}from"./index-DmpbOFQw.js";var i=n(e(),1),a=t(),o=(0,i.lazy)(()=>r(()=>import(`./TechStackScene-CRzuurHe.js`),__vite__mapDeps([0,1,2,3]))),s=()=>(0,a.jsx)(i.Suspense,{fallback:(0,a.jsx)(`div`,{style:{height:`100vh`}}),children:(0,a.jsx)(o,{})});export{s as default};
