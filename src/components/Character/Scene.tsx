@@ -40,6 +40,7 @@ const Scene = () => {
       const camera = new THREE.PerspectiveCamera(14.5, aspect, 0.1, 1000);
       camera.position.z = 10;
       camera.position.set(0, 13.1, 24.7);
+      camera.lookAt(1.5, 13.1, 0); // look right of origin to center the character in viewport
       camera.zoom = 1.1;
       camera.updateProjectionMatrix();
 
@@ -123,7 +124,7 @@ const Scene = () => {
       const onMouseMove = (event: MouseEvent) => {
         handleMouseMove(event, (x, y) => (mouse = { x, y }));
       };
-      
+
       let activeTouchElement: HTMLElement | null = null;
       let touchDebounce: any = null;
 
@@ -154,13 +155,13 @@ const Scene = () => {
       };
 
       document.addEventListener("mousemove", onMouseMove);
-      
+
       const landingDiv = document.getElementById("landingDiv");
       if (landingDiv) {
         landingDiv.addEventListener("touchstart", onTouchStart);
         landingDiv.addEventListener("touchend", onTouchEnd);
       }
-      
+
       let animationFrameId: number;
       const animate = () => {
         animationFrameId = requestAnimationFrame(animate);
@@ -202,9 +203,9 @@ const Scene = () => {
         if (containerEl && renderer.domElement.parentNode === containerEl) {
           containerEl.removeChild(renderer.domElement);
         }
-        
+
         document.removeEventListener("mousemove", onMouseMove);
-        
+
         if (landingDiv) {
           landingDiv.removeEventListener("touchstart", onTouchStart);
           landingDiv.removeEventListener("touchend", onTouchEnd);
