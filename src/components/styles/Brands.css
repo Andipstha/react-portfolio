@@ -1,0 +1,184 @@
+.brands-section {
+  width: 100%;
+  padding: 50px 0;
+  overflow: hidden;
+  background-color: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  box-sizing: border-box;
+}
+
+.brands-container {
+  width: 100%;
+  overflow: hidden;
+}
+
+.brands-flex {
+  display: flex;
+  gap: 30px;
+  width: max-content;
+  align-items: center;
+  will-change: transform;
+}
+
+.brand-logo-card {
+  padding: 14px 28px;
+  background: rgba(255, 255, 255, 0.012);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.brand-logo-card:hover {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* Base Logo Sizing & Monochrome Styling */
+.brand-svg-logo {
+  height: 24px;
+  width: auto;
+  color: rgba(255, 255, 255, 0.32);
+  fill: currentColor;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Ensure all path/text children inherit color */
+.brand-svg-logo text,
+.brand-svg-logo tspan,
+.brand-svg-logo path,
+.brand-svg-logo circle,
+.brand-svg-logo rect,
+.brand-svg-logo g {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Individual Brand Hover Effects (Original colors) */
+
+/* 1. Bigmart */
+.brand-bigmart:hover .brand-svg-logo {
+  color: #ffffff;
+}
+.brand-bigmart:hover .big-part {
+  fill: #f58220; /* Bigmart Orange */
+}
+.brand-bigmart:hover .mart-part {
+  fill: #3f66f5; /* Bright Bigmart Blue */
+}
+
+/* 2. BoatsLab */
+.brand-boatslab:hover .brand-svg-logo {
+  color: #00d2ff;
+}
+
+/* 3. Tulip Appliances */
+.brand-tulip:hover .brand-svg-logo {
+  color: #ff6584;
+}
+
+/* 4. Janaki Flooring */
+.brand-janaki:hover .brand-svg-logo {
+  color: #ff9f43;
+}
+
+/* 5. Makita */
+.brand-makita:hover .brand-svg-logo {
+  color: #e30613;
+}
+
+/* 6. Unilab */
+.brand-unilab:hover .unilab-circle {
+  stroke: #0054a6;
+  fill: rgba(0, 84, 166, 0.08);
+}
+.brand-unilab:hover .unilab-u {
+  stroke: #e21a22;
+}
+.brand-unilab:hover .unilab-text {
+  fill: #ffffff;
+}
+
+/* 7. Figma */
+.brand-figma:hover .figma-text {
+  fill: #ffffff;
+}
+.brand-figma:hover .figma-p1 {
+  fill: #f24e1e;
+}
+.brand-figma:hover .figma-p2 {
+  fill: #a259ff;
+}
+.brand-figma:hover .figma-p3 {
+  fill: #1abcfe;
+}
+.brand-figma:hover .figma-p4 {
+  fill: #ff7262;
+}
+.brand-figma:hover .figma-p5 {
+  fill: #0acf83;
+}
+
+/* 8. Photoshop */
+.brand-photoshop:hover .ps-rect {
+  fill: #001e36;
+  stroke: #31a8ff;
+}
+.brand-photoshop:hover .ps-letters {
+  fill: #31a8ff;
+}
+.brand-photoshop:hover .ps-text {
+  fill: #ffffff;
+}
+
+/* 9. Illustrator */
+.brand-illustrator:hover .ai-rect {
+  fill: #261300;
+  stroke: #ff9a00;
+}
+.brand-illustrator:hover .ai-letters {
+  fill: #ff9a00;
+}
+.brand-illustrator:hover .ai-text {
+  fill: #ffffff;
+}
+
+/* 10. Blender */
+.brand-blender:hover .blender-icon {
+  color: #ea7600;
+}
+.brand-blender:hover .blender-text {
+  fill: #ffffff;
+}
+
+/* Responsive Queries */
+@media only screen and (max-width: 1400px) {
+  .brand-logo-card {
+    padding: 10px 22px;
+  }
+  .brand-svg-logo {
+    height: 20px;
+  }
+  .brands-section {
+    padding: 40px 0;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .brand-logo-card {
+    padding: 8px 18px;
+  }
+  .brand-svg-logo {
+    height: 18px;
+  }
+  .brands-section {
+    padding: 30px 0;
+  }
+}

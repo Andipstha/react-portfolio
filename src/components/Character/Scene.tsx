@@ -11,8 +11,9 @@ import {
   handleTouchMove,
 } from "./utils/mouseUtils";
 import setAnimations from "./utils/animationUtils";
-import { setProgress } from "../utils/progressUtils";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { cleanupScrollTimelines, setCharTimeline, setAllTimeline } from "../utils/GsapScroll";
+import { setProgress } from "../utils/progressUtils";
 
 const Scene = () => {
   const canvasDiv = useRef<HTMLDivElement | null>(null);
@@ -40,7 +41,6 @@ const Scene = () => {
       const camera = new THREE.PerspectiveCamera(14.5, aspect, 0.1, 1000);
       camera.position.z = 10;
       camera.position.set(0, 13.1, 24.7);
-      camera.lookAt(1.5, 13.1, 0); // look right of origin to center the character in viewport
       camera.zoom = 1.1;
       camera.updateProjectionMatrix();
 
@@ -48,7 +48,8 @@ const Scene = () => {
       let screenLight: any | null = null;
       let mixer: THREE.AnimationMixer;
 
-      const clock = new THREE.Clock();
+      const timer = new THREE.Timer();
+      timer.connect(document);
 
       const light = setLighting(scene);
       let progress = setProgress((value) => setLoading(value));
@@ -58,6 +59,7 @@ const Scene = () => {
       let onResize: (() => void) | null = null;
       let cleanupHover: (() => void) | null = null;
       let introTimeout: any = null;
+      let resizeTimeout: ReturnType<typeof setTimeout> | null = null;
 
       loadCharacter().then(async (gltf) => {
         if (isCancelled) return;
@@ -75,13 +77,16 @@ const Scene = () => {
           });
 
           // 2. Adjust foot positions
-          const footR = characterObj.getObjectByName("footR");
-          const footL = characterObj.getObjectByName("footL");
+          const footR = characterObj.getObjectByName("foot.R") || characterObj.getObjectByName("footR");
+          const footL = characterObj.getObjectByName("foot.L") || characterObj.getObjectByName("footL");
           if (footR) footR.position.y = 3.36;
           if (footL) footL.position.y = 3.36;
 
-          // 3. Compile shaders asynchronously
-          await renderer.compileAsync(characterObj, camera, scene);
+          // 3. Compile shaders asynchronously (with a 2-second fallback timeout to prevent hangs)
+          await Promise.race([
+            renderer.compileAsync(characterObj, camera, scene),
+            new Promise((resolve) => setTimeout(resolve, 2000)),
+          ]);
           if (isCancelled) return;
 
           // 4. Setup scroll timelines
@@ -94,8 +99,9 @@ const Scene = () => {
           }
           mixer = animations.mixer;
           scene.add(characterObj);
-          headBone = characterObj.getObjectByName("spine006") || null;
+          headBone = characterObj.getObjectByName("spine.006") || characterObj.getObjectByName("spine006") || null;
           screenLight = characterObj.getObjectByName("screenlight") || null;
+          
           progress.loaded().then(() => {
             if (isCancelled) return;
             introTimeout = setTimeout(() => {
@@ -104,8 +110,24 @@ const Scene = () => {
               animations.startIntro();
             }, 2500) as any;
           });
-          onResize = () => {
-            handleResize(renderer, camera, canvasDiv, characterObj);
+           onResize = () => {
+            if (canvasDiv.current) {
+              canvasDiv.current.style.opacity = "0";
+            }
+            const workTrigger = ScrollTrigger.getById("work");
+            ScrollTrigger.getAll().forEach((trigger) => {
+              if (trigger !== workTrigger) {
+                trigger.kill();
+              }
+            });
+
+            if (resizeTimeout) clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+              handleResize(renderer, camera, canvasDiv, characterObj);
+              if (canvasDiv.current) {
+                canvasDiv.current.style.opacity = "1";
+              }
+            }, 1000);
           };
           window.addEventListener("resize", onResize);
         } else {
@@ -163,8 +185,9 @@ const Scene = () => {
       }
 
       let animationFrameId: number;
-      const animate = () => {
+      const animate = (timestamp: number) => {
         animationFrameId = requestAnimationFrame(animate);
+        timer.update(timestamp);
         if (headBone) {
           handleHeadRotation(
             headBone,
@@ -176,23 +199,25 @@ const Scene = () => {
           );
           light.setPointLight(screenLight);
         }
-        const delta = clock.getDelta();
+        const delta = timer.getDelta();
         if (mixer) {
           mixer.update(delta);
         }
         renderer.render(scene, camera);
       };
-      animate();
+      animate(performance.now());
 
       return () => {
         isCancelled = true;
         if (touchDebounce) clearTimeout(touchDebounce);
         if (introTimeout) clearTimeout(introTimeout);
+        if (resizeTimeout) clearTimeout(resizeTimeout);
         cancelAnimationFrame(animationFrameId);
 
         scene.clear();
         renderer.dispose();
         cleanupScrollTimelines();
+        progress.destroy();
 
         if (onResize) {
           window.removeEventListener("resize", onResize);

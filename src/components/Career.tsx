@@ -20,14 +20,9 @@ const Career = () => {
               </div>
               <h3>2020</h3>
             </div>
-            <ul>
-              <li> Develop creative advertising content for various media, including catalogs, menus, business
-cards, flyers, posters.</li>
-<li>Conceptualize logo design, gif animations, videos, websites and social media channels to
-promote product brands.</li>
-<li>Used composition and color theory knowledge to design websites according to client need
-and preferences. </li>
-            </ul>
+            <p>
+              Taught Computer and Graphics Design to students of grade 8th to Bachelor's level.
+            </p>
           </div>
           <div className="career-info-box">
             <div className="career-info-in">
@@ -39,7 +34,7 @@ and preferences. </li>
             </div>
             <p>
               Designed UI/UX using Figma, creating wireframes and prototypes to streamline the product
-development process.
+              development process.
             </p>
           </div>
           <div className="career-info-box">
@@ -52,7 +47,7 @@ development process.
             </div>
             <p>
               Designed UI/UX using Figma, creating wireframes and prototypes to streamline the product
-development process.
+              development process.
             </p>
           </div>
         </div>

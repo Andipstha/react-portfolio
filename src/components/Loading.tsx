@@ -30,7 +30,7 @@ const Loading = ({ percent }: { percent: number }) => {
       clearTimeout(t1);
       clearTimeout(t2);
     };
-  }, [percent]);
+  }, [percent >= 100]);
 
   useEffect(() => {
     if (!isLoaded) return;

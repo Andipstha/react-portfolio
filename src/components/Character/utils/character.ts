@@ -22,7 +22,8 @@ const setCharacter = () => {
           `${baseUrl}models/character.enc`,
           "Character3D#@"
         );
-        const blobUrl = URL.createObjectURL(new Blob([encryptedBlob]));
+        const blob = new Blob([encryptedBlob]);
+        const blobUrl = URL.createObjectURL(blob);
 
         return await new Promise<GLTF | null>((resolve, reject) => {
           loader.load(

@@ -38,5 +38,11 @@ export const setProgress = (setLoading: (value: number) => void) => {
       }, 2);
     });
   }
-  return { loaded, percent, clear };
+
+  function destroy() {
+    console.log("progressUtils: destroying progress interval timer...");
+    clearInterval(interval);
+  }
+
+  return { loaded, percent, clear, destroy };
 };

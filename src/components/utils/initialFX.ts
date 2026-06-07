@@ -5,7 +5,7 @@ export function initialFX() {
   document.body.style.overflowY = "auto";
   document.querySelector("main")?.classList.add("main-active");
   gsap.to("body", {
-    backgroundColor: "#0b080c",
+    backgroundColor: "#050405",
     duration: 0.5,
     delay: 1,
   });
