@@ -3,13 +3,11 @@ import "./styles/Brands.css";
 
 import logoDelite from "../assets/logo_delite.webp";
 import logoSujal from "../assets/logo_sujal.webp";
-import logoSafal from "../assets/logo_safal.png";
 import logoTulip from "../assets/logo_tulip.webp";
 import logoBigmart from "../assets/logo_bigmart.webp";
-import logoMakita from "../assets/logo_makita.png";
-import logoBoatslab from "../assets/logo_boatslab.png";
 import logoJanaki from "../assets/logo_janaki.webp";
 import logoD20labs from "../assets/logo_d20labs.webp";
+import logoEvince from "../assets/logo_evince.webp";
 
 
 
@@ -22,13 +20,11 @@ interface Brand {
 const brandList: Brand[] = [
   { id: "delite", name: "Delite", logo: logoDelite },
   { id: "sujal", name: "Sujal", logo: logoSujal },
-  { id: "safal", name: "Safal", logo: logoSafal },
   { id: "tulip", name: "Tulip", logo: logoTulip },
   { id: "bigmart", name: "Bigmart", logo: logoBigmart },
-  { id: "makita", name: "Makita", logo: logoMakita },
-  { id: "boatslab", name: "BoatsLab", logo: logoBoatslab },
   { id: "janaki", name: "Janaki", logo: logoJanaki },
   { id: "d20labs", name: "D20Labs", logo: logoD20labs },
+  { id: "evince", name: "Evince", logo: logoEvince },
 ];
 
 // ── Constants ────────────────────────────────────────────────────────────────
