@@ -1,5 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useRef, useEffect } from "react";
 import "./styles/Brands.css";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 
 import logoDelite from "../assets/logo_delite.webp";
 import logoSujal from "../assets/logo_sujal.webp";
@@ -9,7 +11,7 @@ import logoJanaki from "../assets/logo_janaki.webp";
 import logoD20labs from "../assets/logo_d20labs.webp";
 import logoEvince from "../assets/logo_evince.webp";
 
-
+gsap.registerPlugin(useGSAP);
 
 interface Brand {
   id: string;
@@ -18,142 +20,122 @@ interface Brand {
 }
 
 const brandList: Brand[] = [
-  { id: "delite", name: "Delite", logo: logoDelite },
-  { id: "sujal", name: "Sujal", logo: logoSujal },
-  { id: "tulip", name: "Tulip", logo: logoTulip },
-  { id: "bigmart", name: "Bigmart", logo: logoBigmart },
-  { id: "janaki", name: "Janaki", logo: logoJanaki },
-  { id: "d20labs", name: "D20Labs", logo: logoD20labs },
-  { id: "evince", name: "Evince", logo: logoEvince },
+  { id: "delite",  name: "Delite",  logo: logoDelite  },
+  { id: "sujal",   name: "Sujal",   logo: logoSujal   },
+  { id: "tulip",   name: "Tulip",   logo: logoTulip   },
+  { id: "bigmart", name: "Bigmart", logo: logoBigmart  },
+  { id: "janaki",  name: "Janaki",  logo: logoJanaki  },
+  { id: "d20labs", name: "D20 Labs",logo: logoD20labs  },
+  { id: "evince",  name: "Evince",  logo: logoEvince  },
 ];
 
-// ── Constants ────────────────────────────────────────────────────────────────
-const BASE_SPEED = 60;          // px / second — idle auto-scroll
-const SCROLL_SPEED = 180;       // px / second — while user is scrolling
-const RESUME_DELAY_MS = 400;    // ms after last wheel event before reverting to idle
-
-/**
- * Direction convention
- *   +1 → content moves LEFT  (x increases → translateX goes more negative)
- *   -1 → content moves RIGHT (x decreases → translateX goes less negative)
- *
- * Default idle direction = -1 (RIGHT) — "opposite direction" from before.
- * Scroll-down overrides to +1 (LEFT), scroll-up overrides to -1 (RIGHT).
- */
-const DEFAULT_DIR = -1;
+// Duplicate list for a seamless loop
+const allBrands = [...brandList, ...brandList];
 
 const Brands = () => {
-  // Two copies → seamless wrap in both directions
-  const track = [...brandList, ...brandList];
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const trackRef   = useRef<HTMLDivElement>(null);
+  const tweenRef   = useRef<gsap.core.Tween | null>(null);
+  const wheelTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const innerRef = useRef<HTMLDivElement>(null);
+  useGSAP(() => {
+    const track = trackRef.current;
+    if (!track) return;
 
-  const xRef = useRef(0);           // current pixel offset (always ≥ 0)
-  const dirRef = useRef(DEFAULT_DIR); // +1 left | -1 right
-  const speedRef = useRef(BASE_SPEED);  // current speed
-  const rafRef = useRef<number | null>(null);
-  const lastTimeRef = useRef<number | null>(null);
-  const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const halfWidthRef = useRef(0);
+    /** Start the GSAP infinite loop once we know the real track width. */
+    const kickoff = () => {
+      const halfWidth = track.scrollWidth / 2;
+      if (halfWidth <= 0) return;
 
-  useEffect(() => {
-    const inner = innerRef.current;
-    const wrapper = wrapperRef.current;
-    if (!inner) return;
+      tweenRef.current?.kill();
 
-    // ── Measure one copy width ────────────────────────────────────────
-    const measure = () => {
-      halfWidthRef.current = inner.scrollWidth / 2;
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(inner);
-
-    // ── RAF loop ──────────────────────────────────────────────────────
-    const tick = (now: number) => {
-      if (lastTimeRef.current !== null) {
-        const dt = Math.min((now - lastTimeRef.current) / 1000, 0.05); // cap dt at 50 ms
-        const half = halfWidthRef.current;
-
-        if (half > 0) {
-          xRef.current += dirRef.current * speedRef.current * dt;
-
-          // Seamless wrap — works for both directions
-          if (xRef.current >= half) xRef.current -= half;
-          if (xRef.current < 0) xRef.current += half;
-
-          inner.style.transform = `translateX(${-xRef.current}px)`;
+      // from -halfWidth → 0: track drifts right → logos appear to move LEFT-to-RIGHT.
+      // On each repeat GSAP snaps back to -halfWidth, which shows identical content
+      // (the duplicate set), so the loop is visually seamless — no modifier needed.
+      tweenRef.current = gsap.fromTo(
+        track,
+        { x: -halfWidth },
+        {
+          x: 0,
+          duration: 30,
+          ease: "none",
+          repeat: -1,
         }
-      }
-      lastTimeRef.current = now;
-      rafRef.current = requestAnimationFrame(tick);
+      );
     };
 
-    rafRef.current = requestAnimationFrame(tick);
+    // Only start after every logo image has finished loading so scrollWidth is correct.
+    const images = Array.from(track.querySelectorAll<HTMLImageElement>("img"));
+    const pending = images.filter((img) => !img.complete);
 
-    // ── Wheel: change direction & speed while scrolling ───────────────
+    if (pending.length === 0) {
+      // All cached / already loaded – still defer one frame so layout is painted
+      requestAnimationFrame(kickoff);
+    } else {
+      let doneCount = 0;
+      const onLoad = () => {
+        doneCount++;
+        if (doneCount >= pending.length) requestAnimationFrame(kickoff);
+      };
+      pending.forEach((img) => {
+        img.addEventListener("load",  onLoad, { once: true });
+        img.addEventListener("error", onLoad, { once: true }); // count errors too
+      });
+    }
+
+    return () => { tweenRef.current?.kill(); };
+  }, { scope: sectionRef });
+
+  // Wheel: steer loop speed without blocking page scroll
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
     const onWheel = (e: WheelEvent) => {
-      // deltaY > 0 = scrolling DOWN → move LEFT (+1)
-      // deltaY < 0 = scrolling UP   → move RIGHT (-1)
-      dirRef.current = e.deltaY > 0 ? 1 : -1;
-      speedRef.current = SCROLL_SPEED;
-      lastTimeRef.current = null; // reset dt to avoid spike
+      const tween = tweenRef.current;
+      if (!tween) return;
 
-      if (resumeTimer.current) clearTimeout(resumeTimer.current);
-      resumeTimer.current = setTimeout(() => {
-        // Revert to idle auto-scroll after user stops scrolling
-        dirRef.current = DEFAULT_DIR;
-        speedRef.current = BASE_SPEED;
-        lastTimeRef.current = null;
-      }, RESUME_DELAY_MS);
+      const dir     = e.deltaY > 0 ? 1 : -1;   // scroll-down → speed up leftward
+      const current = tween.timeScale();
+      tween.timeScale(gsap.utils.clamp(-5, 5, current + dir * 1.8));
+
+      if (wheelTimeout.current) clearTimeout(wheelTimeout.current);
+      wheelTimeout.current = setTimeout(() => {
+        gsap.to(tween, { timeScale: 1, duration: 1, ease: "power2.out" });
+      }, 220);
     };
 
-    window.addEventListener("wheel", onWheel, { passive: true });
-
-    // ── Hover: pause ──────────────────────────────────────────────────
-    const onEnter = () => { speedRef.current = 0; };
-    const onLeave = () => {
-      speedRef.current = BASE_SPEED;
-      lastTimeRef.current = null;
-    };
-
-    wrapper?.addEventListener("mouseenter", onEnter);
-    wrapper?.addEventListener("mouseleave", onLeave);
-
+    // passive: true — we never call preventDefault, so the page scrolls normally
+    section.addEventListener("wheel", onWheel, { passive: true });
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      if (resumeTimer.current) clearTimeout(resumeTimer.current);
-      ro.disconnect();
-      window.removeEventListener("wheel", onWheel);
-      wrapper?.removeEventListener("mouseenter", onEnter);
-      wrapper?.removeEventListener("mouseleave", onLeave);
+      section.removeEventListener("wheel", onWheel);
+      if (wheelTimeout.current) clearTimeout(wheelTimeout.current);
     };
   }, []);
 
   return (
-    <section className="brands-section" aria-label="Client Brands">
-      <div className="brands-marquee-wrapper" ref={wrapperRef}>
-        {/* Fade-edge masks */}
-        <div className="brands-fade-left" />
-        <div className="brands-fade-right" />
+    <section className="brands-section" aria-label="Client Brands" ref={sectionRef}>
+      <div className="brands-marquee-wrapper">
+        <div className="brands-fade-left"  aria-hidden="true" />
+        <div className="brands-fade-right" aria-hidden="true" />
 
-        <div className="brands-track-outer">
-          <div className="brands-track" ref={innerRef}>
-            {track.map((brand, i) => (
-              <div
-                className={`brand-card brand-${brand.id}`}
-                key={`${brand.id}-${i}`}
-              >
-                <img
-                  src={brand.logo}
-                  alt={brand.name}
-                  className="brand-img"
-                  draggable={false}
-                />
-              </div>
-            ))}
-          </div>
+        <div className="brands-track" ref={trackRef}>
+          {allBrands.map((brand, i) => (
+            <div
+              className={`brand-card brand-${brand.id}`}
+              key={`${brand.id}-${i}`}
+              aria-label={brand.name}
+            >
+              <img
+                src={brand.logo}
+                alt={brand.name}
+                className="brand-img"
+                draggable={false}
+                // help browser cache before JS runs
+                loading={i < brandList.length ? "eager" : "lazy"}
+              />
+            </div>
+          ))}
         </div>
       </div>
     </section>

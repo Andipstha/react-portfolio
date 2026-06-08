@@ -1,4 +1,4 @@
-import "./styles/style.css";
+import "./styles/HoverLinks.css";
 
 const HoverLinks = ({ text, cursor }: { text: string; cursor?: boolean }) => {
   return (
