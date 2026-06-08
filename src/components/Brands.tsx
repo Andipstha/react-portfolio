@@ -1,195 +1,166 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import "./styles/Brands.css";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+import logoDelite from "../assets/logo_delite.webp";
+import logoSujal from "../assets/logo_sujal.webp";
+import logoSafal from "../assets/logo_safal.png";
+import logoTulip from "../assets/logo_tulip.webp";
+import logoBigmart from "../assets/logo_bigmart.webp";
+import logoMakita from "../assets/logo_makita.png";
+import logoBoatslab from "../assets/logo_boatslab.png";
+import logoJanaki from "../assets/logo_janaki.webp";
+import logoD20labs from "../assets/logo_d20labs.webp";
+
+
 
 interface Brand {
   id: string;
-  logo: React.ReactNode;
+  name: string;
+  logo: string;
 }
 
 const brandList: Brand[] = [
-  {
-    id: "bigmart",
-    logo: (
-      <svg viewBox="0 0 160 50" className="brand-svg-logo">
-        <text x="10" y="38" className="bigmart-text-logo" fontFamily="'Inter', 'Arial Black', sans-serif" fontWeight="900" fontSize="38" letterSpacing="-2px">
-          <tspan className="big-part" fill="currentColor">Big</tspan>
-          <tspan className="mart-part" fill="currentColor">mart</tspan>
-        </text>
-      </svg>
-    ),
-  },
-  {
-    id: "boatslab",
-    logo: (
-      <svg viewBox="0 0 180 50" className="brand-svg-logo">
-        <g className="boatslab-icon" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <path d="M12 32h26l-3-8H15l-3 8z" />
-          <path d="M25 24V14l-5 4h5" />
-          <circle cx="25" cy="28" r="1.5" fill="currentColor" />
-        </g>
-        <text x="52" y="36" className="boatslab-text" fontFamily="'Inter', sans-serif" fontWeight="800" fontSize="24" letterSpacing="0.5px" fill="currentColor">
-          BoatsLab
-        </text>
-      </svg>
-    ),
-  },
-  {
-    id: "tulip",
-    logo: (
-      <svg viewBox="0 0 160 50" className="brand-svg-logo">
-        <g className="tulip-icon" fill="currentColor">
-          <path d="M22 12c-3 0-5 3-5 7 0 3 2 5 5 5s5-2 5-5c0-4-2-7-5-7z" />
-          <path d="M17 19c0 3 2 5 5 5s5-2 5-5" fill="none" stroke="currentColor" strokeWidth="2" />
-          <path d="M22 24v12" fill="none" stroke="currentColor" strokeWidth="2" />
-        </g>
-        <text x="42" y="36" className="tulip-text" fontFamily="'Inter', sans-serif" fontWeight="800" fontSize="26" letterSpacing="2px" fill="currentColor">
-          TULIP
-        </text>
-      </svg>
-    ),
-  },
-  {
-    id: "janaki",
-    logo: (
-      <svg viewBox="0 0 180 50" className="brand-svg-logo">
-        <g className="janaki-icon" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <rect x="10" y="12" width="26" height="26" rx="3" />
-          <path d="M10 21h26M10 30h26M19 12v26M28 12v26" />
-        </g>
-        <text x="48" y="36" className="janaki-text" fontFamily="'Inter', sans-serif" fontWeight="850" fontSize="26" letterSpacing="1.5px" fill="currentColor">
-          JANAKI
-        </text>
-      </svg>
-    ),
-  },
-  {
-    id: "makita",
-    logo: (
-      <svg viewBox="0 0 160 50" className="brand-svg-logo">
-        <text x="10" y="38" className="makita-text" fontFamily="'Impact', 'Arial Black', sans-serif" fontStyle="italic" fontWeight="900" fontSize="38" letterSpacing="-1px">
-          <tspan className="makita-part" fill="currentColor">makita</tspan>
-        </text>
-      </svg>
-    ),
-  },
-  {
-    id: "unilab",
-    logo: (
-      <svg viewBox="0 0 180 50" className="brand-svg-logo">
-        <g className="unilab-icon" stroke="currentColor" strokeWidth="3" fill="none">
-          <circle cx="25" cy="25" r="18" className="unilab-circle" />
-          <path d="M18 20v8a7 7 0 0 0 14 0v-8" className="unilab-u" strokeWidth="4" />
-        </g>
-        <text x="55" y="36" className="unilab-text" fontFamily="'Inter', sans-serif" fontWeight="800" fontSize="28" letterSpacing="1px" fill="currentColor">
-          UNILAB
-        </text>
-      </svg>
-    ),
-  },
-  {
-    id: "figma",
-    logo: (
-      <svg viewBox="0 0 140 50" className="brand-svg-logo">
-        <g className="figma-icon" fill="currentColor">
-          <path className="figma-p1" d="M18 14.5c0-2.5-2-4.5-4.5-4.5S9 12 9 14.5s2 4.5 4.5 4.5h4.5v-4.5z" />
-          <path className="figma-p2" d="M9 23.5c0-2.5 2-4.5 4.5-4.5H18v9h-4.5c-2.5 0-4.5-2-4.5-4.5z" />
-          <path className="figma-p3" d="M9 32.5c0-2.5 2-4.5 4.5-4.5h4.5v4.5c0 2.5-2 4.5-4.5 4.5S9 35 9 32.5z" />
-          <path className="figma-p4" d="M18 19h4.5c2.5 0 4.5-2 4.5-4.5S25 10 22.5 10H18v9z" />
-          <path className="figma-p5" d="M18 28h4.5c2.5 0 4.5-2 4.5-4.5S25 19 22.5 19H18v9z" />
-        </g>
-        <text x="36" y="36" className="figma-text" fontFamily="'Inter', sans-serif" fontWeight="700" fontSize="26" letterSpacing="-0.5px" fill="currentColor">
-          Figma
-        </text>
-      </svg>
-    ),
-  },
-  {
-    id: "photoshop",
-    logo: (
-      <svg viewBox="0 0 170 50" className="brand-svg-logo">
-        <rect x="10" y="10" width="30" height="30" rx="4" fill="none" stroke="currentColor" strokeWidth="2.5" className="ps-rect" />
-        <text x="16" y="31" fontFamily="'Inter', sans-serif" fontWeight="900" fontSize="16" fill="currentColor" className="ps-letters">Ps</text>
-        <text x="50" y="36" className="ps-text" fontFamily="'Inter', sans-serif" fontWeight="600" fontSize="24" letterSpacing="0.5px" fill="currentColor">
-          Photoshop
-        </text>
-      </svg>
-    ),
-  },
-  {
-    id: "illustrator",
-    logo: (
-      <svg viewBox="0 0 170 50" className="brand-svg-logo">
-        <rect x="10" y="10" width="30" height="30" rx="4" fill="none" stroke="currentColor" strokeWidth="2.5" className="ai-rect" />
-        <text x="17" y="31" fontFamily="'Inter', sans-serif" fontWeight="900" fontSize="16" fill="currentColor" className="ai-letters">Ai</text>
-        <text x="50" y="36" className="ai-text" fontFamily="'Inter', sans-serif" fontWeight="600" fontSize="24" letterSpacing="0.5px" fill="currentColor">
-          Illustrator
-        </text>
-      </svg>
-    ),
-  },
-  {
-    id: "blender",
-    logo: (
-      <svg viewBox="0 0 160 50" className="brand-svg-logo">
-        <g className="blender-icon" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <circle cx="22" cy="25" r="10" />
-          <circle cx="22" cy="25" r="3.5" fill="currentColor" />
-          <path d="M22 15V8M22 35v7M12 25H5M39 25h-7" />
-        </g>
-        <text x="44" y="36" className="blender-text" fontFamily="'Inter', sans-serif" fontWeight="700" fontSize="24" letterSpacing="-0.5px" fill="currentColor">
-          blender
-        </text>
-      </svg>
-    ),
-  },
+  { id: "delite", name: "Delite", logo: logoDelite },
+  { id: "sujal", name: "Sujal", logo: logoSujal },
+  { id: "safal", name: "Safal", logo: logoSafal },
+  { id: "tulip", name: "Tulip", logo: logoTulip },
+  { id: "bigmart", name: "Bigmart", logo: logoBigmart },
+  { id: "makita", name: "Makita", logo: logoMakita },
+  { id: "boatslab", name: "BoatsLab", logo: logoBoatslab },
+  { id: "janaki", name: "Janaki", logo: logoJanaki },
+  { id: "d20labs", name: "D20Labs", logo: logoD20labs },
 ];
 
+// ── Constants ────────────────────────────────────────────────────────────────
+const BASE_SPEED = 60;          // px / second — idle auto-scroll
+const SCROLL_SPEED = 180;       // px / second — while user is scrolling
+const RESUME_DELAY_MS = 400;    // ms after last wheel event before reverting to idle
+
+/**
+ * Direction convention
+ *   +1 → content moves LEFT  (x increases → translateX goes more negative)
+ *   -1 → content moves RIGHT (x decreases → translateX goes less negative)
+ *
+ * Default idle direction = -1 (RIGHT) — "opposite direction" from before.
+ * Scroll-down overrides to +1 (LEFT), scroll-up overrides to -1 (RIGHT).
+ */
+const DEFAULT_DIR = -1;
+
 const Brands = () => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const flexRef = useRef<HTMLDivElement | null>(null);
+  // Two copies → seamless wrap in both directions
+  const track = [...brandList, ...brandList];
 
-  useGSAP(() => {
-    if (!flexRef.current || !containerRef.current) return;
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
 
-    gsap.fromTo(
-      flexRef.current,
-      { x: -1500 },
-      {
-        x: -100,
-        ease: "none",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1,
-        },
+  const xRef = useRef(0);           // current pixel offset (always ≥ 0)
+  const dirRef = useRef(DEFAULT_DIR); // +1 left | -1 right
+  const speedRef = useRef(BASE_SPEED);  // current speed
+  const rafRef = useRef<number | null>(null);
+  const lastTimeRef = useRef<number | null>(null);
+  const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const halfWidthRef = useRef(0);
+
+  useEffect(() => {
+    const inner = innerRef.current;
+    const wrapper = wrapperRef.current;
+    if (!inner) return;
+
+    // ── Measure one copy width ────────────────────────────────────────
+    const measure = () => {
+      halfWidthRef.current = inner.scrollWidth / 2;
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(inner);
+
+    // ── RAF loop ──────────────────────────────────────────────────────
+    const tick = (now: number) => {
+      if (lastTimeRef.current !== null) {
+        const dt = Math.min((now - lastTimeRef.current) / 1000, 0.05); // cap dt at 50 ms
+        const half = halfWidthRef.current;
+
+        if (half > 0) {
+          xRef.current += dirRef.current * speedRef.current * dt;
+
+          // Seamless wrap — works for both directions
+          if (xRef.current >= half) xRef.current -= half;
+          if (xRef.current < 0) xRef.current += half;
+
+          inner.style.transform = `translateX(${-xRef.current}px)`;
+        }
       }
-    );
-  }, { scope: containerRef });
+      lastTimeRef.current = now;
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+
+    // ── Wheel: change direction & speed while scrolling ───────────────
+    const onWheel = (e: WheelEvent) => {
+      // deltaY > 0 = scrolling DOWN → move LEFT (+1)
+      // deltaY < 0 = scrolling UP   → move RIGHT (-1)
+      dirRef.current = e.deltaY > 0 ? 1 : -1;
+      speedRef.current = SCROLL_SPEED;
+      lastTimeRef.current = null; // reset dt to avoid spike
+
+      if (resumeTimer.current) clearTimeout(resumeTimer.current);
+      resumeTimer.current = setTimeout(() => {
+        // Revert to idle auto-scroll after user stops scrolling
+        dirRef.current = DEFAULT_DIR;
+        speedRef.current = BASE_SPEED;
+        lastTimeRef.current = null;
+      }, RESUME_DELAY_MS);
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: true });
+
+    // ── Hover: pause ──────────────────────────────────────────────────
+    const onEnter = () => { speedRef.current = 0; };
+    const onLeave = () => {
+      speedRef.current = BASE_SPEED;
+      lastTimeRef.current = null;
+    };
+
+    wrapper?.addEventListener("mouseenter", onEnter);
+    wrapper?.addEventListener("mouseleave", onLeave);
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (resumeTimer.current) clearTimeout(resumeTimer.current);
+      ro.disconnect();
+      window.removeEventListener("wheel", onWheel);
+      wrapper?.removeEventListener("mouseenter", onEnter);
+      wrapper?.removeEventListener("mouseleave", onLeave);
+    };
+  }, []);
 
   return (
-    <div className="brands-section" ref={containerRef}>
-      <div className="brands-container">
-        <div className="brands-flex" ref={flexRef}>
-          {brandList.map((brand, index) => (
-            <div className={`brand-logo-card brand-${brand.id}`} key={index}>
-              {brand.logo}
-            </div>
-          ))}
-          {/* Duplicate to ensure a continuous layout */}
-          {brandList.map((brand, index) => (
-            <div className={`brand-logo-card duplicate brand-${brand.id}`} key={`dup-${index}`}>
-              {brand.logo}
-            </div>
-          ))}
+    <section className="brands-section" aria-label="Client Brands">
+      <div className="brands-marquee-wrapper" ref={wrapperRef}>
+        {/* Fade-edge masks */}
+        <div className="brands-fade-left" />
+        <div className="brands-fade-right" />
+
+        <div className="brands-track-outer">
+          <div className="brands-track" ref={innerRef}>
+            {track.map((brand, i) => (
+              <div
+                className={`brand-card brand-${brand.id}`}
+                key={`${brand.id}-${i}`}
+              >
+                <img
+                  src={brand.logo}
+                  alt={brand.name}
+                  className="brand-img"
+                  draggable={false}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

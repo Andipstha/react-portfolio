@@ -1,184 +1,135 @@
+/* =========================================================
+   Brands Section – JS requestAnimationFrame Marquee
+   ========================================================= */
+
 .brands-section {
   width: 100%;
-  padding: 50px 0;
+  padding: 48px 0;
   overflow: hidden;
-  background-color: transparent;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   position: relative;
-  box-sizing: border-box;
 }
 
-.brands-container {
+/* ── Marquee wrapper (clips the track + renders fade masks) ── */
+.brands-marquee-wrapper {
+  position: relative;
   width: 100%;
   overflow: hidden;
 }
 
-.brands-flex {
+/* Gradient fade edges */
+.brands-fade-left,
+.brands-fade-right {
+  position: absolute;
+  top: 0;
+  width: 160px;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.brands-fade-left {
+  left: 0;
+  background: linear-gradient(to right, var(--bg-base, #0a0a0a) 0%, transparent 100%);
+}
+
+.brands-fade-right {
+  right: 0;
+  background: linear-gradient(to left, var(--bg-base, #0a0a0a) 0%, transparent 100%);
+}
+
+/* ── Outer clip container ── */
+.brands-track-outer {
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ── The scrolling track (JS moves this via transform) ── */
+.brands-track {
   display: flex;
-  gap: 30px;
+  align-items: center;
   width: max-content;
-  align-items: center;
+  gap: 20px;
   will-change: transform;
+  /* No CSS animation — driven entirely by requestAnimationFrame */
 }
 
-.brand-logo-card {
-  padding: 14px 28px;
-  background: rgba(255, 255, 255, 0.012);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 100px;
+/* ── Individual brand card ── */
+.brand-card {
+  flex-shrink: 0;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+
+  padding: 14px 28px;
+  border-radius: 100px;
+
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.brand-logo-card:hover {
-  background: rgba(255, 255, 255, 0.035);
-  border-color: rgba(255, 255, 255, 0.12);
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-}
-
-/* Base Logo Sizing & Monochrome Styling */
-.brand-svg-logo {
-  height: 24px;
+/* ── Logo image ── */
+.brand-img {
+  height: 72px;
   width: auto;
-  color: rgba(255, 255, 255, 0.32);
-  fill: currentColor;
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 160px;
+  object-fit: contain;
+  display: block;
+
+  /* Subtle desaturate at rest; full colour on hover */
+  filter: grayscale(40%) brightness(0.85);
+  transition: filter 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
 }
 
-/* Ensure all path/text children inherit color */
-.brand-svg-logo text,
-.brand-svg-logo tspan,
-.brand-svg-logo path,
-.brand-svg-logo circle,
-.brand-svg-logo rect,
-.brand-svg-logo g {
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+.brand-card:hover .brand-img {
+  filter: grayscale(0%) brightness(1);
+  transform: scale(1.06);
 }
 
-/* Individual Brand Hover Effects (Original colors) */
-
-/* 1. Bigmart */
-.brand-bigmart:hover .brand-svg-logo {
-  color: #ffffff;
-}
-.brand-bigmart:hover .big-part {
-  fill: #f58220; /* Bigmart Orange */
-}
-.brand-bigmart:hover .mart-part {
-  fill: #3f66f5; /* Bright Bigmart Blue */
-}
-
-/* 2. BoatsLab */
-.brand-boatslab:hover .brand-svg-logo {
-  color: #00d2ff;
-}
-
-/* 3. Tulip Appliances */
-.brand-tulip:hover .brand-svg-logo {
-  color: #ff6584;
-}
-
-/* 4. Janaki Flooring */
-.brand-janaki:hover .brand-svg-logo {
-  color: #ff9f43;
-}
-
-/* 5. Makita */
-.brand-makita:hover .brand-svg-logo {
-  color: #e30613;
-}
-
-/* 6. Unilab */
-.brand-unilab:hover .unilab-circle {
-  stroke: #0054a6;
-  fill: rgba(0, 84, 166, 0.08);
-}
-.brand-unilab:hover .unilab-u {
-  stroke: #e21a22;
-}
-.brand-unilab:hover .unilab-text {
-  fill: #ffffff;
-}
-
-/* 7. Figma */
-.brand-figma:hover .figma-text {
-  fill: #ffffff;
-}
-.brand-figma:hover .figma-p1 {
-  fill: #f24e1e;
-}
-.brand-figma:hover .figma-p2 {
-  fill: #a259ff;
-}
-.brand-figma:hover .figma-p3 {
-  fill: #1abcfe;
-}
-.brand-figma:hover .figma-p4 {
-  fill: #ff7262;
-}
-.brand-figma:hover .figma-p5 {
-  fill: #0acf83;
-}
-
-/* 8. Photoshop */
-.brand-photoshop:hover .ps-rect {
-  fill: #001e36;
-  stroke: #31a8ff;
-}
-.brand-photoshop:hover .ps-letters {
-  fill: #31a8ff;
-}
-.brand-photoshop:hover .ps-text {
-  fill: #ffffff;
-}
-
-/* 9. Illustrator */
-.brand-illustrator:hover .ai-rect {
-  fill: #261300;
-  stroke: #ff9a00;
-}
-.brand-illustrator:hover .ai-letters {
-  fill: #ff9a00;
-}
-.brand-illustrator:hover .ai-text {
-  fill: #ffffff;
-}
-
-/* 10. Blender */
-.brand-blender:hover .blender-icon {
-  color: #ea7600;
-}
-.brand-blender:hover .blender-text {
-  fill: #ffffff;
-}
-
-/* Responsive Queries */
-@media only screen and (max-width: 1400px) {
-  .brand-logo-card {
-    padding: 10px 22px;
-  }
-  .brand-svg-logo {
-    height: 20px;
-  }
+/* ── Responsive ── */
+@media (max-width: 1400px) {
   .brands-section {
-    padding: 40px 0;
+    padding: 36px 0;
+  }
+
+  .brand-card {
+    padding: 12px 22px;
+  }
+
+  .brand-img {
+    height: 54px;
+  }
+
+  .brands-fade-left,
+  .brands-fade-right {
+    width: 100px;
   }
 }
 
-@media only screen and (max-width: 768px) {
-  .brand-logo-card {
-    padding: 8px 18px;
-  }
-  .brand-svg-logo {
-    height: 18px;
-  }
+@media (max-width: 768px) {
   .brands-section {
-    padding: 30px 0;
+    padding: 28px 0;
+  }
+
+  .brand-card {
+    padding: 10px 18px;
+  }
+
+  .brand-img {
+    height: 40px;
+  }
+
+  .brands-track {
+    gap: 14px;
+  }
+
+  .brands-fade-left,
+  .brands-fade-right {
+    width: 60px;
   }
 }
