@@ -5,11 +5,48 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import WorkGallery, { type WorkProject } from "./WorkGallery";
 
-import design1 from "../assets/design1.jpg";
-import design2 from "../assets/design2.jpg";
-import design3 from "../assets/design3.jpg";
-import design4 from "../assets/design4.jpg";
-import design5 from "../assets/design5.jpg";
+import janaki_design1 from "../assets/works/janaki/design1.jpg";
+import janaki_design2 from "../assets/works/janaki/design2.jpg";
+import janaki_design3 from "../assets/works/janaki/design3.jpg";
+import janaki_design4 from "../assets/works/janaki/design4.jpg";
+import janaki_design5 from "../assets/works/janaki/design5.jpg";
+import janaki_design6 from "../assets/works/janaki/design6.jpg";
+import janaki_design7 from "../assets/works/janaki/design7.jpg";
+
+import oraimo_design1 from "../assets/works/oraimo/design1.jpg";
+import oraimo_design2 from "../assets/works/oraimo/design2.jpg";
+import oraimo_design3 from "../assets/works/oraimo/design3.jpg";
+import oraimo_design4 from "../assets/works/oraimo/design4.jpg";
+import oraimo_design5 from "../assets/works/oraimo/design5.jpg";
+import oraimo_design6 from "../assets/works/oraimo/design6.jpg";
+import oraimo_design7 from "../assets/works/oraimo/design7.jpg";
+import oraimo_design8 from "../assets/works/oraimo/design8.jpg";
+import oraimo_design9 from "../assets/works/oraimo/design9.jpg";
+
+import techno_design1 from "../assets/works/techno/design1.jpg";
+import techno_design2 from "../assets/works/techno/design2.jpg";
+import techno_design3 from "../assets/works/techno/design3.jpg";
+import techno_design4 from "../assets/works/techno/design4.jpg";
+import techno_design5 from "../assets/works/techno/design5.jpg";
+
+import janvigroup_design1 from "../assets/works/janvigroup/design1.jpg";
+import janvigroup_design2 from "../assets/works/janvigroup/design2.jpg";
+import janvigroup_design3 from "../assets/works/janvigroup/design3.jpg";
+import janvigroup_design4 from "../assets/works/janvigroup/design4.jpg";
+import janvigroup_design5 from "../assets/works/janvigroup/design5.jpg";
+import janvigroup_design6 from "../assets/works/janvigroup/design6.jpg";
+import janvigroup_design7 from "../assets/works/janvigroup/design7.jpg";
+import janvigroup_design8 from "../assets/works/janvigroup/design8.jpg";
+import janvigroup_design9 from "../assets/works/janvigroup/design9.jpg";
+
+import safalmilk_design1 from "../assets/works/safalmilk/design1.jpg";
+import safalmilk_design2 from "../assets/works/safalmilk/design2.jpg";
+import safalmilk_design3 from "../assets/works/safalmilk/design3.jpg";
+import safalmilk_design4 from "../assets/works/safalmilk/design4.jpg";
+import safalmilk_design5 from "../assets/works/safalmilk/design5.jpg";
+import safalmilk_design6 from "../assets/works/safalmilk/design6.jpg";
+import safalmilk_design7 from "../assets/works/safalmilk/design7.jpg";
+
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -27,21 +64,23 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 const designWorks: WorkProject[] = [
   {
     num: "01",
-    title: "BoatsLab",
-    category: "Product Launch & Art Direction",
-    tools: "Adobe Photoshop",
-    thumbnail: design1,
+    title: "Janaki Vinyl Flooring",
+    category: "Social Media Post, 3D Modeling, Ad Concepting",
+    tools: "Adobe Photoshop, Adobe Illustrator, Blender",
+    thumbnail: janaki_design1,
     gallery: [
-      { type: "image", src: design1, caption: "Hero Campaign Visual" },
-      { type: "image", src: design2, caption: "Product Detail Shot" },
-      { type: "image", src: design3, caption: "Social Media Banner" },
-      { type: "image", src: design4, caption: "Lifestyle Photography" },
-      { type: "image", src: design5, caption: "Packaging Concept" },
-      { type: "image", src: design1, caption: "Brand Collateral" },
-      {
-        type: "video", src: "https://www.instagram.com/reel/DX_PBmQD_8F/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", caption: "Brand Reel"
-      },
-      { type: "video", src: "/videos/CANDYs.mp4", poster: design1, caption: "..." }
+      { type: "image", src: janaki_design1, caption: "Hero Campaign Visual" },
+      { type: "image", src: janaki_design2, caption: "Product Detail Shot" },
+      { type: "image", src: janaki_design3, caption: "Social Media Banner" },
+      { type: "image", src: janaki_design4, caption: "Lifestyle Photography" },
+      { type: "image", src: janaki_design5, caption: "Packaging Concept" },
+      { type: "image", src: janaki_design6, caption: "Packaging Concept" },
+      { type: "image", src: janaki_design7, caption: "Packaging Concept" },
+      // { type: "image", src: design6, caption: "Brand Collateral" },
+      // {
+      //   type: "video", src: "https://www.instagram.com/reel/DX_PBmQD_8F/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==", caption: "Brand Reel"
+      // },
+      // { type: "video", src: "/videos/CANDYs.mp4", poster: design1, caption: "..." }
 
 
       // Add your real assets here ↓
@@ -50,62 +89,70 @@ const designWorks: WorkProject[] = [
   },
   {
     num: "02",
-    title: "Tulip Appliances",
+    title: "Oraimo",
     category: "Retail Branding & Marketing Campaign",
     tools: "Illustrator, Photoshop, Figma",
-    thumbnail: design2,
+    thumbnail: oraimo_design1,
     gallery: [
-      { type: "image", src: design2, caption: "Campaign Poster" },
-      { type: "image", src: design3, caption: "Store Branding" },
-      { type: "image", src: design4, caption: "Product Leaflet" },
-      { type: "image", src: design5, caption: "Digital Banner" },
-      { type: "image", src: design1, caption: "Social Kit" },
-      { type: "image", src: design2, caption: "Billboard Mockup" },
+      { type: "image", src: oraimo_design9, caption: "Billboard Mockup" },
+      { type: "image", src: oraimo_design8, caption: "Billboard Mockup" },
+      { type: "image", src: oraimo_design7, caption: "Billboard Mockup" },
+      { type: "image", src: oraimo_design6, caption: "Billboard Mockup" },
+      { type: "image", src: oraimo_design5, caption: "Social Kit" },
+      { type: "image", src: oraimo_design4, caption: "Digital Banner" },
+      { type: "image", src: oraimo_design3, caption: "Product Leaflet" },
+      { type: "image", src: oraimo_design2, caption: "Store Branding" },
+      { type: "image", src: oraimo_design1, caption: "Campaign Poster" },
+
+
     ],
   },
   {
     num: "03",
-    title: "Janaki Vinyl Flooring",
+    title: "Techno Mobile",
     category: "Visual Identity & Marketing",
     tools: "Figma, Illustrator, After Effects",
-    thumbnail: design3,
+    thumbnail: techno_design1,
     gallery: [
-      { type: "image", src: design3, caption: "Brand Identity" },
-      { type: "image", src: design4, caption: "Showroom Visuals" },
-      { type: "image", src: design5, caption: "Catalogue Design" },
-      { type: "image", src: design1, caption: "Instagram Post Series" },
-      { type: "image", src: design2, caption: "Product Brochure" },
-      { type: "image", src: design3, caption: "Motion Teaser" },
+      { type: "image", src: techno_design1, caption: "Brand Identity" },
+      { type: "image", src: techno_design2, caption: "Showroom Visuals" },
+      { type: "image", src: techno_design3, caption: "Catalogue Design" },
+      { type: "image", src: techno_design4, caption: "Instagram Post Series" },
+      { type: "image", src: techno_design5, caption: "Product Brochure" },
     ],
   },
   {
     num: "04",
-    title: "Makita",
+    title: "Janvi Group",
     category: "Packaging & Advertising Design",
     tools: "Illustrator, Photoshop",
-    thumbnail: design4,
+    thumbnail: janvigroup_design1,
     gallery: [
-      { type: "image", src: design4, caption: "Tool Packaging" },
-      { type: "image", src: design5, caption: "Print Ad" },
-      { type: "image", src: design1, caption: "Catalogue Spread" },
-      { type: "image", src: design2, caption: "Point-of-Sale Display" },
-      { type: "image", src: design3, caption: "Social Campaign" },
-      { type: "image", src: design4, caption: "Banner Set" },
+      { type: "image", src: janvigroup_design1, caption: "Tool Packaging" },
+      { type: "image", src: janvigroup_design2, caption: "Print Ad" },
+      { type: "image", src: janvigroup_design3, caption: "Catalogue Spread" },
+      { type: "image", src: janvigroup_design4, caption: "Point-of-Sale Display" },
+      { type: "image", src: janvigroup_design5, caption: "Social Campaign" },
+      { type: "image", src: janvigroup_design6, caption: "Banner Set" },
+      { type: "image", src: janvigroup_design7, caption: "Banner Set" },
+      { type: "image", src: janvigroup_design8, caption: "Banner Set" },
+      { type: "image", src: janvigroup_design9, caption: "Banner Set" },
     ],
   },
   {
     num: "05",
-    title: "Unilab",
+    title: "Safal Milk",
     category: "Visual Identity & Confectionery Packaging",
     tools: "Illustrator, Photoshop, Blender",
-    thumbnail: design5,
+    thumbnail: safalmilk_design1,
     gallery: [
-      { type: "image", src: design5, caption: "Packaging System" },
-      { type: "image", src: design1, caption: "Brand Guidelines" },
-      { type: "image", src: design2, caption: "3D Product Render" },
-      { type: "image", src: design3, caption: "Retail Display" },
-      { type: "image", src: design4, caption: "Label Design" },
-      { type: "image", src: design5, caption: "Gift Packaging" },
+      { type: "image", src: safalmilk_design1, caption: "Packaging System" },
+      { type: "image", src: safalmilk_design2, caption: "Brand Guidelines" },
+      { type: "image", src: safalmilk_design3, caption: "3D Product Render" },
+      { type: "image", src: safalmilk_design4, caption: "Retail Display" },
+      { type: "image", src: safalmilk_design5, caption: "Label Design" },
+      { type: "image", src: safalmilk_design6, caption: "Gift Packaging" },
+      { type: "image", src: safalmilk_design7, caption: "Gift Packaging" },
     ],
   },
 ];
